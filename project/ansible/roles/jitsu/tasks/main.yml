@@ -1,0 +1,26 @@
+---
+- name: Pull Redis image
+  docker_image:
+    name: redis
+
+- name: Start Redis container
+  docker_container:
+    name: redis
+    image: redis
+  state: started
+
+- name: Get Redis container IP
+  command: docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" {{ redis_container_id }}
+  register: redis_ip
+
+- name: Start Jitsu
+  docker_container:
+    name: jitsu
+    image: jitsucom/jitsu
+    env:
+      REDIS_URL: "redis://{{ redis_ip.stdout }}:6379"
+  ports:
+    - "8000:8000"
+  state: started
+vars:
+  redis_container_id: "{{ lookup(pipe, docker ps -q --filter ancestor=redis) }}"

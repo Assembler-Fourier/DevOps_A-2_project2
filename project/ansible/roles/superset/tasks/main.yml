@@ -1,0 +1,10 @@
+---
+- name: Start Apache Superset
+  docker_container:
+    name: superset
+    image: apache/superset
+    env:
+      SUPERSET_SECRET_KEY: vQmRkwpRNm5u_6IKXBX9739bXkhiueMF
+  ports:
+    - "8080:8088"
+  state: started
